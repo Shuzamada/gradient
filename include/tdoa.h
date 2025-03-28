@@ -18,6 +18,8 @@ namespace tdoa
   };
   using Points = std::vector<Point>;
   double calculateDistance(const Point& p1, const Point& p2);
+  std::vector< double > calculateTDOAValues(const Points& unknownPoints, const Points& knownPoints);                            
+  double calculateError(const std::vector<double>& knownTDOA, const std::vector<double>& calculatedTDOA);
 }
 
 

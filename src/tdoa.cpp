@@ -7,5 +7,30 @@ namespace tdoa
   {
     return std::sqrt(std::pow(p2.x_ - p1.x_, 2) + std::pow(p2.y_ - p1.y_, 2));
   }
+
+  std::vector< double > calculateTDOAValues(const Points& unknownPoints, const Points& knownPoints)
+  {
+    std::vector< double > tdoaValues;
+    
+    for (const auto& known : knownPoints)
+    {
+      
+      tdoaValues.push_back(calculateDistance(unknownPoints[0], known) - calculateDistance(unknownPoints[1], known)); // AD - BD 
+      tdoaValues.push_back(calculateDistance(unknownPoints[0], known) - calculateDistance(unknownPoints[2], known)); // AD - CD 
+      tdoaValues.push_back(calculateDistance(unknownPoints[1], known) - calculateDistance(unknownPoints[2], known)); // BD - CD
+    }
+    
+    return tdoaValues;
+  }
+  
+  double calculateError(const std::vector<double>& knownTDOA, const std::vector<double>& calculatedTDOA)
+  {
+    double error = 0.0;
+    for (size_t i = 0; i < knownTDOA.size(); ++i)
+    {
+      error += std::pow(knownTDOA[i] - calculatedTDOA[i], 2);
+    }
+    return error;
+  }
 }
  
