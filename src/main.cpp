@@ -8,30 +8,33 @@ int main()
   std::cout << "TDOA Inverse Localization Program" << "\n";
   
   Points knownPoints = {
-    Point(5.0, 5.0),   // D
-    Point(10.0, 0.0),  // E
-    Point(0.0, 10.0)   // F
+    Point(50.0, 75.0),   // D
+    Point(100.0, 80.0),  // E
+    Point(40.0, 10.0)   // F
   };
   
   Points realUnknownPoints = {
-    Point(7.0, 3.0),   // A 
-    Point(8.0, 7.0),   // B 
-    Point(5.0, 2.0)    // C 
+    Point(70.0, 30.0),   // A 
+    Point(80.0, 70.0),   // B 
+    Point(50.0, 20.0)    // C 
   };
   
-  std::vector< double > knownTDOA = calculateTDOAValues(realUnknownPoints, knownPoints);
+
+  std::vector< double > tdoaBuffer(knownPoints.size() * 3);
+  calculateTDOAValues(realUnknownPoints, knownPoints, tdoaBuffer);
+  std::vector< double > knownTDOA = tdoaBuffer;
   
   std::cout << "Known TDOA values (based on real coordinates):" << "\n";
   for (size_t i = 0; i < knownTDOA.size(); ++i)
   {
-    std::cout << std::fixed << std::setprecision(2) << knownTDOA[i] << " ";
+    std::cout << std::fixed << std::setprecision(4) << knownTDOA[i] << " ";
     if ((i + 1) % 3 == 0) std::cout << "\n";
   }
   
   Points initialGuess = { //rand
-    Point(0.0, 0.0),   // A 
-    Point(10.0, 10.0), // B 
-    Point(5.0, 0.0)    // C 
+    Point(20.0, 50.0),   // A 
+    Point(100.0, 100.0), // B 
+    Point(50.0, 60.0)    // C 
   };
   
   std::cout << "Starting optimization with initial guess:" << "\n";
