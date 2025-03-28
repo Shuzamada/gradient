@@ -23,7 +23,7 @@ namespace tdoa
     return tdoaValues;
   }
   
-  double calculateError(const std::vector<double>& knownTDOA, const std::vector<double>& calculatedTDOA)
+  double calculateError(const std::vector< double >& knownTDOA, const std::vector< double >& calculatedTDOA)
   {
     double error = 0.0;
     for (size_t i = 0; i < knownTDOA.size(); ++i)
@@ -31,6 +31,41 @@ namespace tdoa
       error += std::pow(knownTDOA[i] - calculatedTDOA[i], 2);
     }
     return error;
+  }
+
+
+  double calculatePartialDerivativeX(const Points& unknownPoints, 
+                                    const Points& knownPoints,
+                                    const std::vector< double >& knownTDOA,
+                                    int pointIndex)
+  {
+    double h = 0.0001;
+    Points pointsPlusH = unknownPoints;
+    pointsPlusH[pointIndex].x_ += h;
+    std::vector< double > tdoaPlusH = calculateTDOAValues(pointsPlusH, knownPoints);
+    double errorPlusH = calculateError(knownTDOA, tdoaPlusH);
+    std::vector< double > tdoaOriginal = calculateTDOAValues(unknownPoints, knownPoints);
+    double errorOriginal = calculateError(knownTDOA, tdoaOriginal);
+    return (errorPlusH - errorOriginal) / h;
+  }
+  
+  double calculatePartialDerivativeY(const Points& unknownPoints, 
+                                      const Points& knownPoints,
+                                      const std::vector< double >& knownTDOA,
+                                      int pointIndex)
+  {
+    double h = 0.0001;
+    
+    Points pointsPlusH = unknownPoints;
+    pointsPlusH[pointIndex].y_ += h;
+    
+    std::vector< double > tdoaPlusH = calculateTDOAValues(pointsPlusH, knownPoints);
+    double errorPlusH = calculateError(knownTDOA, tdoaPlusH);
+    
+    std::vector< double > tdoaOriginal = calculateTDOAValues(unknownPoints, knownPoints);
+    double errorOriginal = calculateError(knownTDOA, tdoaOriginal);
+    
+    return (errorPlusH - errorOriginal) / h;
   }
 }
  
