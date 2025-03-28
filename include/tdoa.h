@@ -16,18 +16,25 @@ namespace tdoa
       y_(y)
       {}
   };
-  using Points = std::vector<Point>;
+  using Points = std::vector< Point >;
   double calculateDistance(const Point& p1, const Point& p2);
   std::vector< double > calculateTDOAValues(const Points& unknownPoints, const Points& knownPoints);                            
   double calculateError(const std::vector<double>& knownTDOA, const std::vector<double>& calculatedTDOA);
-  double calculatePartialDerivativeX(const Points& unknownPoints, 
-                                    const Points& knownPoints,
-                                    const std::vector< double >& knownTDOA,
-                                    int pointIndex);
-  double calculatePartialDerivativeY(const Points& unknownPoints, 
-                                    const Points& knownPoints,
-                                    const std::vector< double >& knownTDOA,
-                                    int pointIndex);
+
+  std::vector< double > calculatePartialDerivativesX(const Points& unknownPoints, 
+                                                    const Points& knownPoints,
+                                                    const std::vector< double >& knownTDOA);
+
+  std::vector< double > calculatePartialDerivativesY(const Points& unknownPoints, 
+                                                  const Points& knownPoints,
+                                                  const std::vector< double >& knownTDOA);
+
+  Points optimizeCoordinates(const Points& initialGuess, 
+                              const Points& knownPoints,
+                              const std::vector< double >& knownTDOA,
+                              double learningRate = 0.001,
+                              int maxIterations = 100000,
+                              double errorThreshold = 1e-6);
 }
 
 

@@ -1,5 +1,6 @@
 #include "tdoa.h"
 #include <cmath>
+#include <iostream>
 
 namespace tdoa
 {
@@ -34,38 +35,91 @@ namespace tdoa
   }
 
 
-  double calculatePartialDerivativeX(const Points& unknownPoints, 
-                                    const Points& knownPoints,
-                                    const std::vector< double >& knownTDOA,
-                                    int pointIndex)
+  std::vector< double > calculatePartialDerivativesX(const Points& unknownPoints, 
+                                                      const Points& knownPoints,
+                                                      const std::vector< double >& knownTDOA)
   {
-    double h = 0.0001;
-    Points pointsPlusH = unknownPoints;
-    pointsPlusH[pointIndex].x_ += h;
-    std::vector< double > tdoaPlusH = calculateTDOAValues(pointsPlusH, knownPoints);
-    double errorPlusH = calculateError(knownTDOA, tdoaPlusH);
+    const double h = 0.0001;
+
+    const size_t numPoints = unknownPoints.size();
+    std::vector< double > derivatives(numPoints);
+    
     std::vector< double > tdoaOriginal = calculateTDOAValues(unknownPoints, knownPoints);
     double errorOriginal = calculateError(knownTDOA, tdoaOriginal);
-    return (errorPlusH - errorOriginal) / h;
+    for (size_t i = 0; i < numPoints; ++i)
+    {
+      Points pointsPlusH = unknownPoints;
+      pointsPlusH[i].x_ += h;
+      std::vector< double > tdoaPlusH = calculateTDOAValues(pointsPlusH, knownPoints);
+      double errorPlusH = calculateError(knownTDOA, tdoaPlusH);
+      derivatives[i] = (errorPlusH - errorOriginal) / h;
+    }
+    
+    return derivatives;
   }
   
-  double calculatePartialDerivativeY(const Points& unknownPoints, 
-                                      const Points& knownPoints,
-                                      const std::vector< double >& knownTDOA,
-                                      int pointIndex)
+  std::vector< double > calculatePartialDerivativesY(const Points& unknownPoints, 
+                                                      const Points& knownPoints,
+                                                      const std::vector< double >& knownTDOA)
   {
-    double h = 0.0001;
-    
-    Points pointsPlusH = unknownPoints;
-    pointsPlusH[pointIndex].y_ += h;
-    
-    std::vector< double > tdoaPlusH = calculateTDOAValues(pointsPlusH, knownPoints);
-    double errorPlusH = calculateError(knownTDOA, tdoaPlusH);
-    
+    const double h = 0.0001;
+    const size_t numPoints = unknownPoints.size();
+
+    std::vector< double > derivatives(numPoints);
     std::vector< double > tdoaOriginal = calculateTDOAValues(unknownPoints, knownPoints);
+
     double errorOriginal = calculateError(knownTDOA, tdoaOriginal);
+    for (size_t i = 0; i < numPoints; ++i)
+    {
+      Points pointsPlusH = unknownPoints;
+      pointsPlusH[i].y_ += h;
+      std::vector< double > tdoaPlusH = calculateTDOAValues(pointsPlusH, knownPoints);
+      double errorPlusH = calculateError(knownTDOA, tdoaPlusH);
+      derivatives[i] = (errorPlusH - errorOriginal) / h;
+    }
     
-    return (errorPlusH - errorOriginal) / h;
+    return derivatives;
+  }
+
+
+  Points optimizeCoordinates(const Points& initialGuess, 
+                              const Points& knownPoints,
+                              const std::vector< double >& knownTDOA,
+                              double learningRate,
+                              int maxIterations,
+                              double errorThreshold)
+  {
+    Points currentPoints = initialGuess;
+    std::vector< double > currentTDOA = calculateTDOAValues(currentPoints, knownPoints);
+    double currentError = calculateError(knownTDOA, currentTDOA);
+    
+    int iteration = 0;
+
+    while (iteration < maxIterations && currentError > errorThreshold)
+    {
+      std::vector< double > gradsX = calculatePartialDerivativesX(currentPoints, knownPoints, knownTDOA);
+      std::vector< double > gradsY = calculatePartialDerivativesY(currentPoints, knownPoints, knownTDOA);
+      
+      for (size_t i = 0; i < currentPoints.size(); ++i)
+      {
+        currentPoints[i].x_ -= learningRate * gradsX[i];
+        currentPoints[i].y_ -= learningRate * gradsY[i];
+      }
+      
+      currentTDOA = calculateTDOAValues(currentPoints, knownPoints);
+      currentError = calculateError(knownTDOA, currentTDOA);
+      
+      if (iteration % 100 == 0)
+      {
+        std::cout << "Iteration: " << iteration << ", Error: " << currentError << "\n";
+      }
+      
+      ++iteration;
+    }
+    
+    std::cout << "Optimization completed after " << iteration << " iterations. Final error: " << currentError << "\n";
+    
+    return currentPoints;
   }
 }
  
