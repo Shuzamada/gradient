@@ -72,7 +72,7 @@ namespace tdoa
   {
     Points currentPoints = initialGuess;
     
-    std::vector<double> tdoaBuffer(knownPoints.size() * 3);
+    std::vector< double > tdoaBuffer(knownPoints.size() * 3);
     Points gradsPoint(currentPoints.size());
     
     calculateTDOAValues(currentPoints, knownPoints, tdoaBuffer);

@@ -24,20 +24,20 @@ namespace tdoa
 
   void calculateTDOAValues(const Points& unknownPoints, 
                           const Points& knownPoints,
-                          std::vector<double>& output);
+                          std::vector< double >& output);
                                            
-  double calculateError(const std::vector<double>& knownTDOA, 
-                       const std::vector<double>& calculatedTDOA);
+  double calculateError(const std::vector< double >& knownTDOA, 
+                       const std::vector< double >& calculatedTDOA);
 
   void calculatePartialDerivatives(const Points& unknownPoints, 
                                   const Points& knownPoints,
-                                  const std::vector<double>& knownTDOA,
+                                  const std::vector< double >& knownTDOA,
                                   Points& gradsPoint,
-                                  std::vector<double>& tdoaBuffer);
+                                  std::vector< double >& tdoaBuffer);
 
   Points optimizeCoordinates(const Points& initialGuess, 
                             const Points& knownPoints,
-                            const std::vector<double>& knownTDOA,
+                            const std::vector< double >& knownTDOA,
                             double learningRate = 0.01,
                             int maxIterations = 1000000,
                             double errorThreshold = 1e-4);

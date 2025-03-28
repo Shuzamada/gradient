@@ -9,4 +9,5 @@ include_directories(${PROJECT_SOURCE_DIR}/include)
 add_executable(TDOA_Localization
   src/main.cpp
   src/tdoa.cpp
+  src/io_utils.cpp
 )
